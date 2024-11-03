@@ -1,18 +1,37 @@
-async function predict() {
+document.getElementById('getWeather').addEventListener('click', async function() {
+    const track = document.getElementById('track').value;
+    const weatherInfoDiv = document.getElementById('weatherInfo');
+
     try {
-        const response = await fetch('http://127.0.0.1:5000/predict', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ state: [1, 0.8, 10] })  // Ví dụ về trạng thái đầu vào
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        const pitStopDecision = data.action === 1 ? "Pit this lap" : "No Box";
-        document.getElementById("result").innerText = pitStopDecision;
+        const response = await fetch(`/api/weather?location=${track}`);
+        const weatherData = await response.json();
+        
+        weatherInfoDiv.innerHTML = `
+            <h2>Weather at ${track}</h2>
+            <p>Temperature: ${weatherData.main.temp} °C</p>
+            <p>Description: ${weatherData.weather[0].description}</p>
+        `;
     } catch (error) {
-        console.error('There has been a problem with your fetch operation:', error);
-        document.getElementById("result").innerText = 'Error fetching prediction';
+        console.error('Error:', error);
     }
-}
+});
+
+// Add a button to get pit stop decision
+document.getElementById('predictPitTime').addEventListener('click', async function() {
+    const tireWear = parseFloat(document.getElementById('tireWearInput').value); // From 0 to 1
+    const speed = parseFloat(document.getElementById('speedInput').value); // Average speed
+    
+    try {
+        const response = await fetch('/api/get_pit_decision', {  // Updated endpoint
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ tire_wear: tireWear, speed: speed }),
+        });
+        const data = await response.json();
+        alert(`Predicted lap time: ${data.predicted_lap_time.toFixed(2)} seconds`);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
