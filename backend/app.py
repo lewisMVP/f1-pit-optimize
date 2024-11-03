@@ -62,10 +62,14 @@ def get_pit_decision():
         new_data = pd.DataFrame({'tire_wear': [tire_wear], 'speed': [speed]})
         predicted_time = model.predict(new_data)
 
+        # Logic to decide pit or no pit
+        pit_threshold = 85  # Example threshold for lap time (in seconds)
+        pit_decision = "Pit" if predicted_time[0] < pit_threshold else "No Pit"
+
         # Print the predicted information
-        print(f'Tire wear: {tire_wear}, Speed: {speed} km/h, Predicted lap time: {predicted_time[0]:.2f} seconds')
+        print(f'Tire wear: {tire_wear}, Speed: {speed} km/h, Predicted lap time: {predicted_time[0]:.2f} seconds, Decision: {pit_decision}')
         
-        return jsonify({'predicted_lap_time': predicted_time[0]})
+        return jsonify({'predicted_lap_time': predicted_time[0], 'pit_decision': pit_decision})
     except Exception as e:
         print(f"Error: {str(e)}")  # Print error message to console
         return jsonify({'error': str(e)}), 500

@@ -22,7 +22,7 @@ document.getElementById('predictPitTime').addEventListener('click', async functi
     const speed = parseFloat(document.getElementById('speedInput').value); // Average speed
     
     try {
-        const response = await fetch('/api/get_pit_decision', {  // Updated endpoint
+        const response = await fetch('/api/get_pit_decision', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ document.getElementById('predictPitTime').addEventListener('click', async functi
             body: JSON.stringify({ tire_wear: tireWear, speed: speed }),
         });
         const data = await response.json();
-        alert(`Predicted lap time: ${data.predicted_lap_time.toFixed(2)} seconds`);
+        alert(`Predicted lap time: ${data.predicted_lap_time.toFixed(2)} seconds\nDecision: ${data.pit_decision}`);
     } catch (error) {
         console.error('Error:', error);
     }
