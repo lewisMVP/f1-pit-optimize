@@ -2,8 +2,10 @@ from flask import Flask, jsonify, request
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import joblib
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Initialize and train the linear regression model
 def train_model():
@@ -31,24 +33,26 @@ def train_model():
 def get_pit_decision():
     try:
         data = request.get_json()
-        tire_wear = data['tire_health']  # Using tire_health
-        race_position = data['race_position']  # Using race position
+        tire_wear = data['tire_health']  # Đảm bảo rằng key này đúng
+        race_position = data['race_position']  # Đảm bảo rằng key này đúng
+        current_lap = data['current_lap']  # Lấy current lap từ yêu cầu
 
-        # Load the trained model
         model = joblib.load('linear_regression_model.pkl')
 
-        # Predict lap time based on tire wear and race position
         new_data = pd.DataFrame({'tire_wear': [tire_wear], 'race_position': [race_position]})
         predicted_time = model.predict(new_data)
 
-        # Logic to decide pit or no pit
-        pit_threshold = 85  # Example threshold for lap time (in seconds)
+        pit_threshold = 85  # Ngưỡng thời gian vòng đua
         pit_decision = "Pit" if predicted_time[0] < pit_threshold else "No Pit"
 
-        return jsonify({'predicted_lap_time': predicted_time[0], 'pit_decision': pit_decision})
+        return jsonify({
+            'predicted_lap_time': predicted_time[0],
+            'pit_decision': pit_decision,
+            'current_lap': current_lap  # Trả về current lap
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     train_model()  # Train the model when the application starts
-    app.run(debug=True)
+    app.run(debug=True, port=5000)  # Đảm bảo rằng server chạy trên cổng 5000
