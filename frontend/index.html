@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pit Stop Stategy Optimization</title>
+    <title>Pit Stop Decision</title>
     <script src="script.js" defer></script>
 </head>
 <body>
-    <h1>Pit Stop Stategy Optimization</h1>
-    <label for="tire_health">Tire Health (0 to 1):</label>
+    <h1>Pit Stop Decision</h1>
+    <label for="tire_health">Tire Health (0-1):</label>
     <input type="number" id="tire_health" step="0.01" min="0" max="1" required>
     <br>
     <label for="race_position">Race Position:</label>
-    <input type="number" id="race_position" min="1" required>
+    <input type="number" id="race_position" required>
+    <br>
+    <label for="track_length">Track Length (meters):</label>
+    <input type="number" id="track_length" required>
     <br>
     <label for="current_lap">Current Lap:</label>
-    <input type="number" id="current_lap" min="1" required>
+    <input type="number" id="current_lap" required>
     <br>
-    <button onclick="getPitStopDecision()">Get Pit Decision</button>
-    <p id="decision"></p>
+    <button onclick="getPitStopDecision()">Get Pit Stop Decision</button>
+    <p id="result"></p>
 </body>
 </html>
