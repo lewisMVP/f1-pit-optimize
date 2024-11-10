@@ -1,29 +1,29 @@
-async function getPitStopDecision() {
-    const tireHealth = parseFloat(document.getElementById('tire_health').value);
-    const racePosition = parseInt(document.getElementById('race_position').value);
-    const trackLength = parseInt(document.getElementById('track_length').value);
-    const currentLap = parseInt(document.getElementById('current_lap').value);  // Lấy thông tin current lap
-
-    const response = await fetch('http://127.0.0.1:5000/api/get_pit_decision', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            tire_health: tireHealth,
-            race_position: racePosition,
-            track_length: trackLength,
-            current_lap: currentLap  // Gửi thông tin current lap
+document.getElementById('getEventsBtn').addEventListener('click', () => {
+    axios.get('/api/events')
+        .then(response => {
+            const eventsDiv = document.getElementById('events');
+            eventsDiv.innerHTML = '';
+            response.data.forEach(event => {
+                const p = document.createElement('p');
+                p.textContent = `${event.name} - ${event.country} (${event.date})`;
+                eventsDiv.appendChild(p);
+            });
         })
-    });
+        .catch(error => console.error(error));
+});
 
-    const data = await response.json();
+document.getElementById('predictPitBtn').addEventListener('click', () => {
+    const tireWear = parseFloat(document.getElementById('tireWear').value);
+    const racePosition = parseFloat(document.getElementById('racePosition').value);
+    const trackLength = parseFloat(document.getElementById('trackLength').value);
 
-    // Kiểm tra lỗi
-    if (response.ok) {
-        document.getElementById('result').innerText = 
-            `Predicted lap time: ${data.predicted_lap_time.toFixed(2)} seconds, Decision: ${data.pit_decision}, Current Lap: ${data.current_lap}`;
-    } else {
-        document.getElementById('result').innerText = `Error: ${data.error}`;
-    }
-}
+    axios.post('/api/get_pit_decision', {
+        tire_wear: tireWear,
+        race_position: racePosition,
+        track_length: trackLength
+    })
+    .then(response => {
+        document.getElementById('prediction').textContent = `Predicted Lap Time: ${response.data.predicted_lap_time.toFixed(2)}s - ${response.data.pit_decision} (Lap: ${response.data.current_lap})`;
+    })
+    .catch(error => console.error(error));
+});
