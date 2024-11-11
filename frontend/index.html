@@ -5,22 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pit Stop Strategy Optimizing</title>
     <script src="script.js" defer></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body onload="loadCircuitData()">
     <h1>Pit Stop Strategy Optimizing</h1>
+    
+    <label for="circuit">Select Circuit:</label>
+    <select id="circuit" onchange="updateTrackLength()">
+        <option value="">--Select a Circuit--</option>
+    </select>
+    <br>
+
     <label for="tire_health">Tire Health (0-1):</label>
     <input type="number" id="tire_health" step="0.01" min="0" max="1" required>
     <br>
+    
     <label for="race_position">Race Position:</label>
     <input type="number" id="race_position" required>
     <br>
+
     <label for="track_length">Track Length (meters):</label>
-    <input type="number" id="track_length" required>
+    <input type="number" id="track_length" disabled required>
     <br>
+
     <label for="current_lap">Current Lap:</label>
     <input type="number" id="current_lap" required>
     <br>
+
     <button onclick="getPitStopDecision()">Get Pit Stop Decision</button>
+
     <p id="result"></p>
+
+    <div id="weatherInfo">
+        <label for="weather">Weather Conditions:</label>
+        <select id="weather">
+            <option value="clear">Clear</option>
+            <option value="rain">Rain</option>
+        </select>
+    </div>
+
 </body>
 </html>
