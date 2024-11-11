@@ -1,29 +1,34 @@
-async function getPitStopDecision() {
-    const tireHealth = parseFloat(document.getElementById('tire_health').value);
-    const racePosition = parseInt(document.getElementById('race_position').value);
-    const trackLength = parseInt(document.getElementById('track_length').value);
-    const currentLap = parseInt(document.getElementById('current_lap').value);  // Lấy thông tin current lap
+// Function to dynamically load circuit data from API
+async function loadCircuitData() {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/get_circuit_info', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                // Bạn có thể gửi thêm thông tin nếu cần, ví dụ như circuit_name
+                circuit_name: "Some Circuit Name" // Ví dụ
+            })
+        });
 
-    const response = await fetch('http://127.0.0.1:5000/api/get_pit_decision', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            tire_health: tireHealth,
-            race_position: racePosition,
-            track_length: trackLength,
-            current_lap: currentLap  // Gửi thông tin current lap
-        })
-    });
+        // Check if response is OK
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-    const data = await response.json();
+        const data = await response.json();
+        circuitData = data; // Store circuit data globally
 
-    // Kiểm tra lỗi
-    if (response.ok) {
-        document.getElementById('result').innerText = 
-            `Predicted lap time: ${data.predicted_lap_time.toFixed(2)} seconds, Decision: ${data.pit_decision}, Current Lap: ${data.current_lap}`;
-    } else {
-        document.getElementById('result').innerText = `Error: ${data.error}`;
+        const circuitSelect = document.getElementById('circuit');
+        for (const [circuitName, circuitDetails] of Object.entries(circuitData)) {
+            const option = document.createElement('option');
+            option.value = circuitName;
+            option.textContent = circuitName;
+            circuitSelect.appendChild(option);
+        }
+    } catch (error) {
+        console.error('Error loading circuit data:', error);
+        alert('Failed to load circuit data. Please check the API.');
     }
 }
