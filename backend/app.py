@@ -1,8 +1,14 @@
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+
 from flask import Flask, jsonify, request
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 import joblib
 from flask_cors import CORS
+
+# Add necessary imports for reinforcement learning
+import numpy as np
+from stable_baselines3 import PPO
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5500"}})
@@ -10,9 +16,7 @@ CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5500"}})
 # Load circuit data from CSV
 def load_circuit_data():
     try:
-        # Read the CSV file containing circuit information
         df = pd.read_csv('circuits.csv')
-        # Convert to dictionary format
         circuit_data = df.set_index('Circuit Name').to_dict('index')
         return circuit_data
     except Exception as e:
@@ -24,7 +28,6 @@ circuit_data = load_circuit_data()
 @app.route('/api/get_circuit_info', methods=['POST'])
 def get_circuit_info():
     try:
-        # Return all circuit data
         return jsonify(circuit_data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -36,35 +39,31 @@ def get_pit_decision():
         tire_wear = data['tire_wear']
         race_position = data['race_position']
         circuit_name = data['circuit_name']
-        weather = data.get('weather', 'clear')  # Default to clear if not specified
+        weather = data.get('weather', 'clear')
 
-        # Get circuit info
         if circuit_name not in circuit_data:
             return jsonify({'error': 'Circuit not found'}), 404
             
         circuit_info = circuit_data[circuit_name]
-        track_length = circuit_info['Track Length (km)'] * 1000  # Convert km to meters
+        track_length = circuit_info['Track Length (km)'] * 1000
 
-        # Load the model
-        model = joblib.load('linear_regression_model.pkl')
+        # Load the reinforcement learning model
+        model = PPO.load('reinforcement_learning_model.zip')
         
         # Prepare data for prediction
-        new_data = pd.DataFrame({
-            'tire_wear': [tire_wear],
-            'race_position': [race_position],
-            'track_length': [track_length]
-        })
-        
-        predicted_time = model.predict(new_data)
+        observation = np.array([tire_wear, race_position, track_length])
+
+        # Get the action (pit decision) from the model
+        action, _states = model.predict(observation, deterministic=True)
         
         # Adjust pit threshold based on weather
         base_threshold = 85
         pit_threshold = base_threshold * 1.2 if weather == 'rain' else base_threshold
         
-        pit_decision = "Pit" if predicted_time[0] > pit_threshold else "No Pit"
+        pit_decision = "Pit" if action[0] > pit_threshold else "No Pit"
 
         return jsonify({
-            'predicted_lap_time': float(predicted_time[0]),
+            'action': action[0],
             'pit_decision': pit_decision,
             'circuit': circuit_name,
             'track_type': circuit_info['Track Type'],
