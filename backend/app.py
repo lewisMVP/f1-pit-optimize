@@ -92,7 +92,6 @@ def get_pit_decision():
         except Exception as e:
             logging.error(f"Error during model prediction: {str(e)}")
             return jsonify({'error': 'Error during model prediction'}), 500
-
         # Adjust pit threshold based on weather
         base_threshold = 85
         pit_threshold = base_threshold * 1.2 if weather == 'rain' else base_threshold
