@@ -34,6 +34,12 @@ circuit_data = load_circuit_data()
 
 @app.route('/api/get_circuit_info', methods=['POST'])
 def get_circuit_info():
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'ok'})
+        response.headers.add('Access-Control-Allow-Origin', 'http://127.0.0.1:5500')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        return response
     try:
         if not circuit_data:
             return jsonify({'error': 'Circuit data is not available'}), 500
@@ -68,7 +74,7 @@ def get_pit_decision():
 
         # Load the reinforcement learning model
         try:
-            model = PPO.load('reinforcement_learning_model.zip')
+            model = PPO.load('reinforcement_learning_model.h5')
             logging.debug("Model loaded successfully.")
         except FileNotFoundError:
             logging.error("Reinforcement learning model file not found.")

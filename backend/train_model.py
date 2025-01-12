@@ -5,8 +5,8 @@ import time
 from datetime import datetime
 
 def train_model(
-    episodes=100,  # Reduced from 1000
-    max_steps=200,  # Reduced from 500
+    episodes=100,  
+    max_steps=200,  
     batch_size=32,
     min_epsilon=0.01,
     save_interval=10
