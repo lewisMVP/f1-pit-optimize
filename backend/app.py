@@ -13,7 +13,6 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 # Initialize Flask app and configure CORS
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5500"}})
-
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -32,7 +31,7 @@ def load_circuit_data():
 
 circuit_data = load_circuit_data()
 
-@app.route('/api/get_circuit_info', methods=['POST'])
+@app.route('/api/get_circuit_info', methods=['POST','OPTIONS'])
 def get_circuit_info():
     if request.method == 'OPTIONS':
         response = jsonify({'status': 'ok'})
@@ -74,7 +73,7 @@ def get_pit_decision():
 
         # Load the reinforcement learning model
         try:
-            model = PPO.load('reinforcement_learning_model.h5')
+            model = PPO.load('reinforcement_learning_model.keras')
             logging.debug("Model loaded successfully.")
         except FileNotFoundError:
             logging.error("Reinforcement learning model file not found.")
