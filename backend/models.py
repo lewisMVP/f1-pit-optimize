@@ -14,7 +14,7 @@ X = data[['tire_wear', 'race_position', 'track_length']]  # Các đặc trưng
 y = data['lap_time']  # Mục tiêu (thời gian vòng đua)
 
 # Tạo và huấn luyện mô hình Decision Tree Regressor
-model = DecisionTreeRegressor()  # Thay thế LinearRegression bằng DecisionTreeRegressor
+model = DecisionTreeRegressor()  
 model.fit(X, y)
 
 # Lưu mô hình đã huấn luyện
