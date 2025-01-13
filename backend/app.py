@@ -71,8 +71,8 @@ def get_pit_decision():
         model = joblib.load('linear_regression_model.pkl')
         new_data = pd.DataFrame({'tire_wear': [tire_wear], 'race_position': [race_position], 'track_length': [track_length]})
         predicted_time = model.predict(new_data)
-        
-        pit_threshold = 85
+
+        pit_threshold = 85  # Ngưỡng thời gian vòng đua
         pit_decision = "Pit" if predicted_time[0] < pit_threshold else "No Pit"
         
         return jsonify({
